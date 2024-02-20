@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: page-scraper-job
+spec:
+  schedule: "*/10 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: page-scraper
+            image: page-scraper
+            imagePullPolicy: Never
+          restartPolicy: OnFailure
