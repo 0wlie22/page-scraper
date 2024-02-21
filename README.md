@@ -44,4 +44,8 @@ python main.py
 docker build . -t page-scraper
 
 docker run page-scraper
+
+# Or with Kubernetes
+
+kubectl apply -f cronjob.jaml
 ```
