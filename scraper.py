@@ -21,7 +21,7 @@ class Scraper:
     def __init__(self, base_url, flat_url):
         self.base_url = base_url
         self.flat_url = flat_url
-        self.db = TinyDB("db.json")
+        self.db = TinyDB("/var/db/db.json")
 
     def scrape_page(self, page_number):
         url = f"{self.base_url}page{page_number}.html"

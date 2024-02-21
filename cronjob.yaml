@@ -3,13 +3,33 @@ kind: CronJob
 metadata:
   name: page-scraper-job
 spec:
-  schedule: "*/10 * * * *"
+  schedule: "* * * * *"
   jobTemplate:
     spec:
       template:
         spec:
           containers:
-          - name: page-scraper
-            image: page-scraper
-            imagePullPolicy: Never
+            - name: page-scraper
+              image: page-scraper
+              imagePullPolicy: Never
+              volumeMounts:
+                - name: database
+                  mountPath: /var/db
           restartPolicy: OnFailure
+          volumes:
+            - name: database
+              persistentVolumeClaim:
+                claimName: page-scraper-pvc
+                readOnly: false
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: page-scraper-pvc
+spec:
+  storageClassName: local-path
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests: 
+      storage: 256Mi
