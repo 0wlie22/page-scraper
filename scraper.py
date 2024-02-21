@@ -2,6 +2,7 @@ import logging
 
 import requests
 from bs4 import BeautifulSoup
+from requests.models import default_hooks
 from tinydb import Query, TinyDB
 
 
@@ -69,10 +70,14 @@ class Scraper:
                 }
             )
 
-            self.notify(index_counter, flat_url, flat.price)
+            self.notify(flat_url, flat.price, flat.description)
 
-    def notify(self, index, flat_url, price):
-        requests.post(
-            "http://ntfy.sh/flat-advertisments",
-            json={"index": index, "url": flat_url, "price": price[0:3]},
+    def notify(self, flat_url, price, description):
+        response=requests.post(
+            "https://ntfy.sh/flat-advertisments",
+            headers={"Click": f"{flat_url}",
+                     "Title": "New flat found"},
+            data=f"{description} - {price}"
         )
+        logging.info(response)
+        logging.info(f"Notification sent")
