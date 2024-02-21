@@ -17,5 +17,5 @@ jobs:
       - name: "Github Container Registry: Build and push Docker image"
         uses: pmorelli92/github-container-registry-build-push@2.1.0
         with:
-          github-push-secret: ${GITHUB_TOKEN}
+          github-push-secret: ${secrets.PERSONAL_ACCESS_TOKEN}
           docker-image-name: flat-scraper
