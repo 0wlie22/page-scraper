@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 from requests.models import default_hooks
 from tinydb import Query, TinyDB
+import time
 
 
 class Flat:
@@ -71,13 +72,13 @@ class Scraper:
             )
 
             self.notify(flat_url, flat.price, flat.description)
+            time.sleep(0.5) # to not hit ntfy rate limit
 
     def notify(self, flat_url, price, description):
-        response=requests.post(
+        requests.post(
             "https://ntfy.sh/flat-advertisments",
             headers={"Click": f"{flat_url}",
                      "Title": "New flat found"},
             data=f"{description} - {price}"
         )
-        logging.info(response)
-        logging.info(f"Notification sent")
+        logging.info("Notification sent")
