@@ -50,7 +50,7 @@ class Scraper:
 
             index_counter += 1
 
-            flat_url = f"{self.flat_url}{flat_id}"
+            flat_url = f"{self.flat_url}{flat_id}.html"
 
             flat = Flat(
                 id=flat_id,
