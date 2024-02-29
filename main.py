@@ -15,10 +15,7 @@ def main():
         format="%(asctime)s [INFO] - %(message)s",
     )
 
-    scraper = Scraper(
-        base_url="https://www.ss.com/lv/real-estate/flats/riga/centre/hand_over/",
-        flat_url="https://m.ss.com/msg/lv/real-estate/flats/riga/centre/",
-    )
+    hometowns = ["centre", "grizinkalns"]
 
     for hometown in hometowns:
         logging.info(f"Scraping {hometown}")
