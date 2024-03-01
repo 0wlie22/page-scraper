@@ -1,10 +1,12 @@
 import logging
+import time
 
 import requests
 from bs4 import BeautifulSoup
 from requests.models import default_hooks
 from tinydb import Query, TinyDB
-import time
+
+DB_PATH = "/var/db/db.json"
 
 
 class Flat:
@@ -23,7 +25,7 @@ class Scraper:
     def __init__(self, base_url, flat_url):
         self.base_url = base_url
         self.flat_url = flat_url
-        self.db = TinyDB("/var/db/db.json")
+        self.db = TinyDB(DB_PATH)
 
     def scrape_page(self, page_number):
         url = f"{self.base_url}page{page_number}.html"
