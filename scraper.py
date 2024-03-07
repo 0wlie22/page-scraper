@@ -3,84 +3,91 @@ import time
 
 import requests
 from bs4 import BeautifulSoup
-from requests.models import default_hooks
 from tinydb import Query, TinyDB
 
 DB_PATH = "/var/db/db.json"
-
+NTFY_URL = "https://ntfy.sh/tesy"
 
 class Flat:
-    def __init__(self, id, index, url, description, price):
+    def __init__(self, table: list, id: str, url: str) -> None:
         self.id = id
-        self.index = index
         self.url = url
-        self.description = description
-        self.price = price
+        self.street = table[3].text
+        self.rooms = table[4].text
+        self.area = table[5].text
+        self.floor = table[6].text
+        self.type = table[7].text
+        self.price = table[9].text.split(" ")
 
-    def __str__(self):
-        return f"Nr: {self.index}, URL: {self.url}, Description: {self.description}, Price: {self.price}\n"
+    def __str__(self) -> str:
+        return f"Flat {self.id}: {self.street}, {self.rooms}, {self.area}, {self.floor}, {self.type}, {self.price}"
 
 
 class Scraper:
-    def __init__(self, base_url, flat_url):
+    def __init__(self, base_url, flat_url) -> None:
         self.base_url = base_url
         self.flat_url = flat_url
         self.db = TinyDB(DB_PATH)
 
-    def scrape_page(self, page_number):
+    def scrape_page(self, page_number) -> None:
         url = f"{self.base_url}page{page_number}.html"
         response = requests.get(url)
 
         parsed_html = BeautifulSoup(response.text, "html.parser")
-        table = parsed_html.body.find("table", {"align": "center"})
-        lines = table.find_all("tr")
+        if not parsed_html.body:
+            logging.error(f"Failed to parse page {page_number}")
+            return
 
-        index_counter = 0
+        table = parsed_html.body.find("table", {"align": "center"})
+        if not table:
+            logging.error(f"Failed to find table in page {page_number}")
+            return
+
+        lines = table.find_all("tr") # pyright: ignore
+        if not lines:
+            logging.error(f"Failed to find table in page {page_number}")
+            return
+
 
         for line in lines[1:-1]:
             flat_id = line.find_all("td")[1].find("a").get("href").split("/")[-1].split(".")[0]
 
+            # Check if the flat is already in the database
             if self.db.search(Query().id == flat_id):
                 logging.info(f"Flat {flat_id} already in the database")
                 continue
 
-            price = line.find_all("td")[-1].text.split(" ")
-            description = line.find_all("td")[2].text
+            flat = Flat(line.find_all("td"), flat_id, f"{self.flat_url}{flat_id}.html")
 
-            if "mēn" not in price[2] or float(price[0].replace(",", "")) > 350:
+            # Check if the flat is rented by days or is too expensive
+            if "mēn" not in flat.price[2] or float(flat.price[0].replace(",", "")) > 350:
+                logging.info(f"Flat {flat_id} is too expensive")
                 continue
 
-            index_counter += 1
-
-            flat_url = f"{self.flat_url}{flat_id}.html"
-
-            flat = Flat(
-                id=flat_id,
-                index=index_counter,
-                url=flat_url,
-                description=description,
-                price="".join(price),
-            )
+            flat.price = flat.price[0]
 
             logging.info(flat)
 
             self.db.insert(
                 {
                     "id": flat.id,
-                    "url": flat.url,
-                    "description": flat.description,
-                    "price": flat.price,
+                    "url": flat.url
                 }
             )
 
-            self.notify(flat_url, flat.price, flat.description)
+            self.notify(flat)
             time.sleep(0.5) # to not hit ntfy rate limit
+            break
 
-    def notify(self, flat_url, price, description):
+    @staticmethod
+    def notify(flat: Flat):
         requests.post(
             "https://ntfy.sh/flat-advertisments",
-            headers={"Click": f"{flat_url}",
-                     "Title": "New flat found"},
-            data=f"{description} - {price}"
+            headers={
+                "Click": f"{flat.url}",
+                "Title": "New flat found"
+            },
+            data={f"New flat found{flat.street}": f"{flat.rooms}, {flat.area}, {flat.floor}, {flat.type}, {flat.price}"}
         )
+
         logging.info("Notification sent")
