@@ -87,7 +87,7 @@ class Scraper:
                 "Click": f"{flat.url}",
                 "Title": "New flat found"
             },
-            data=f"New flat found{flat.street}, {flat.rooms}, {flat.area}, {flat.floor}, {flat.type}, {flat.price}"
+            data=f"New flat found: {flat.street}, {flat.rooms} rooms, {flat.area} m2, {flat.floor} floor, {flat.type}, {flat.price} euro"
         )
 
         logging.info("Notification sent")
