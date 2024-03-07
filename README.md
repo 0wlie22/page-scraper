@@ -20,8 +20,8 @@ This project is a web scraper written in Python for extracting information about
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/sscom-scraper.git
-cd sscom-scraper
+git clone https://github.com/0wlie22/page-scraper
+cd page-scraper
 ```
 
 2. Install dependencies
