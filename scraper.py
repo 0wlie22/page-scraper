@@ -66,10 +66,8 @@ class Scraper:
             flat = Flat(line.find_all("td"), flat_id, f"{self.flat_url}{flat_id}.html")
 
             # Check if the flat is rented by days or is too expensive
-            if (
-                "mēn" not in flat.price[2]
-                or 200 > float(flat.price[0].replace(",", "")) > 330
-            ):
+            price = self.normalize_price(flat.price[0])
+            if "mēn" not in flat.price[2] or price > 330 or price < 200:
                 logging.info(f"Flat {flat_id} is too expensive")
                 continue
 
@@ -92,3 +90,6 @@ class Scraper:
         )
 
         logging.info("Notification sent")
+
+    def normalize_price(self, price: str) -> float:
+        return float(price.replace(",", ""))
