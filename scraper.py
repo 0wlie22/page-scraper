@@ -8,6 +8,7 @@ from tinydb import Query, TinyDB
 DB_PATH = "/var/db/db.json"
 NTFY_URL = "https://ntfy.sh/tesy"
 
+
 class Flat:
     def __init__(self, table: list, id: str, url: str) -> None:
         self.id = id
@@ -43,14 +44,19 @@ class Scraper:
             logging.error(f"Failed to find table in page {page_number}")
             return
 
-        lines = table.find_all("tr") # pyright: ignore
+        lines = table.find_all("tr")  # pyright: ignore
         if not lines:
             logging.error(f"Failed to find table in page {page_number}")
             return
 
-
         for line in lines[1:-1]:
-            flat_id = line.find_all("td")[1].find("a").get("href").split("/")[-1].split(".")[0]
+            flat_id = (
+                line.find_all("td")[1]
+                .find("a")
+                .get("href")
+                .split("/")[-1]
+                .split(".")[0]
+            )
 
             # Check if the flat is already in the database
             if self.db.search(Query().id == flat_id):
@@ -60,7 +66,10 @@ class Scraper:
             flat = Flat(line.find_all("td"), flat_id, f"{self.flat_url}{flat_id}.html")
 
             # Check if the flat is rented by days or is too expensive
-            if "mēn" not in flat.price[2] or float(flat.price[0].replace(",", "")) > 350:
+            if (
+                "mēn" not in flat.price[2]
+                or 200 > float(flat.price[0].replace(",", "")) > 330
+            ):
                 logging.info(f"Flat {flat_id} is too expensive")
                 continue
 
@@ -68,26 +77,18 @@ class Scraper:
 
             logging.info(flat)
 
-            self.db.insert(
-                {
-                    "id": flat.id,
-                    "url": flat.url
-                }
-            )
+            self.db.insert({"id": flat.id, "url": flat.url})
 
             self.notify(flat)
-            time.sleep(0.5) # to not hit ntfy rate limit
+            time.sleep(0.5)  # to not hit ntfy rate limit
             break
 
     @staticmethod
     def notify(flat: Flat):
         requests.post(
             "https://ntfy.sh/flat-advertisments",
-            headers={
-                "Click": f"{flat.url}",
-                "Title": "New flat found"
-            },
-            data=f"{flat.street}, {flat.rooms} rooms, {flat.area} m2, {flat.floor} floor, {flat.type}, {flat.price} euro"
+            headers={"Click": f"{flat.url}", "Title": "New flat found"},
+            data=f"{flat.street}, {flat.rooms} rooms, {flat.area} m2, {flat.floor} floor, {flat.type}, {flat.price} euro",
         )
 
         logging.info("Notification sent")
