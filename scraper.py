@@ -1,11 +1,12 @@
 import logging
+import os
 import time
 
 import requests
 from bs4 import BeautifulSoup
 from tinydb import Query, TinyDB
 
-DB_PATH = "/var/db/db.json"
+DB_PATH = os.getenv("PS_DB_PATH", "./db.json")
 NTFY_URL = "https://ntfy.sh/tesy"
 
 
@@ -50,13 +51,7 @@ class Scraper:
             return
 
         for line in lines[1:-1]:
-            flat_id = (
-                line.find_all("td")[1]
-                .find("a")
-                .get("href")
-                .split("/")[-1]
-                .split(".")[0]
-            )
+            flat_id = line.find_all("td")[1].find("a").get("href").split("/")[-1].split(".")[0]
 
             # Check if the flat is already in the database
             if self.db.search(Query().id == flat_id):

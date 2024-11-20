@@ -1,17 +1,24 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: page-scraper-job
+  name: page-scraper
+  namespace: flat-scraper
+  labels:
+    app.kubernetes.io/name: page-scraper
 spec:
-  schedule: "* * * * *"
+  successfulJobsHistoryLimit: 3
+  schedule: "*/10 * * * *"
   jobTemplate:
     spec:
       template:
         spec:
           containers:
             - name: page-scraper
-              image: page-scraper
-              imagePullPolicy: Never
+              image: ghcr.io/0wlie22/flat-scraper:latest
+              imagePullPolicy: Always
+              env:
+                - name: PS_DB_PATH
+                  value: /var/db/db.json
               volumeMounts:
                 - name: database
                   mountPath: /var/db
@@ -21,15 +28,3 @@ spec:
               persistentVolumeClaim:
                 claimName: page-scraper-pvc
                 readOnly: false
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: page-scraper-pvc
-spec:
-  storageClassName: local-path
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests: 
-      storage: 256Mi
