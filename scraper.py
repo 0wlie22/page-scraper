@@ -6,8 +6,12 @@ import requests
 from bs4 import BeautifulSoup
 from tinydb import Query, TinyDB
 
+import json
+from shapely.geometry import shape, Point
+
 DB_PATH = os.getenv("PS_DB_PATH", "./db.json")
 NTFY_URL = "https://ntfy.sh/tesy"
+
 
 
 class Flat:
@@ -81,7 +85,7 @@ class Scraper:
         requests.post(
             "https://ntfy.sh/flat-advertisments",
             headers={"Click": f"{flat.url}", "Title": "New flat found"},
-            data=f"{flat.street}, {flat.rooms} rooms, {flat.area} m2, {flat.floor} floor, {flat.type}, {flat.price} euro",
+            data=f"{flat.price} euro, {flat.street}, {flat.rooms} rooms, {flat.area} m2, {flat.floor} floor",
         )
 
         logging.info("Notification sent")
