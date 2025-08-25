@@ -1,2 +1,5 @@
 [tools]
-python = {version="3.12", virtualenv="{{ env.HOME }}/.cache/venv/page-scraper"}
+python = "3.12"
+
+[env]
+_.python.venv = "{{env.HOME}}/.cache/venv/page-scraper"
