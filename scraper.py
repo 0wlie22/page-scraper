@@ -20,8 +20,6 @@ from config import (
 )
 
 
-
-
 class Scraper:
     def __init__(self, dry_run: bool = False):
         self.url = SS_URL
