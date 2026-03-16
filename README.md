@@ -35,7 +35,7 @@ pip install -r requirements.txt
 ### Running as a standart script
 
 ```bash
-python main.py
+python -m src.main
 ```
 
 ### Running as Dockerized application

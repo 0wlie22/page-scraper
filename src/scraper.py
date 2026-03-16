@@ -1,6 +1,7 @@
 import html
 import json
 import logging
+import os
 import re
 import time
 import unicodedata
@@ -11,13 +12,8 @@ from playwright.sync_api import sync_playwright
 from shapely.geometry import Point, shape
 from tinydb import Query, TinyDB
 
-from apartment import Appartment
-from config import (
-    NTFY_URL,
-    REGIONS_FILE,
-    SS_COOKIES_URL,
-    SS_URL,
-)
+from .apartment import Appartment
+from .config import NTFY_URL, REGIONS_FILE, SS_COOKIES_URL, SS_URL
 
 
 class Scraper:
@@ -25,13 +21,20 @@ class Scraper:
         self.url = SS_URL
         self.cookies_url = SS_COOKIES_URL
         self.dry_run = dry_run
-        with open(REGIONS_FILE) as f:
+        regions_path = REGIONS_FILE
+        if not os.path.isabs(regions_path):
+            regions_path = os.path.join(
+                os.path.dirname(__file__), os.pardir, regions_path
+            )
+            regions_path = os.path.normpath(regions_path)
+        with open(regions_path) as f:
             geojson = json.load(f)
 
         self.bad_coordinates = [
             shape(feature["geometry"]) for feature in geojson["features"]
         ]
-        self.db = TinyDB("db.json")
+        db_path = os.getenv("DB_PATH", "db.json")
+        self.db = TinyDB(db_path)
 
     def run(self):
         with sync_playwright() as p:

@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: page-scraper
-  namespace: flat-scraper
+  name: page-scraper-pvc
+  namespace: default
   labels:
-    app.kubernetes.io/name: page-scraper
+    app.kubernetes.io/name: page-scraper-pvc
 spec:
   accessModes:
     - ReadWriteOnce

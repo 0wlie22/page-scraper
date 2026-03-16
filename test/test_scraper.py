@@ -2,8 +2,8 @@ import unittest
 from unittest.mock import MagicMock
 from typing import cast
 
-from apartment import Appartment
-from scraper import Scraper
+from src.apartment import Appartment
+from src.scraper import Scraper
 
 
 class AppartmentValidationTests(unittest.TestCase):

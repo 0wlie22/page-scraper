@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: page-scraper
-  namespace: flat-scraper
+  namespace: default
   labels:
     app.kubernetes.io/name: page-scraper
 spec:
@@ -14,17 +14,29 @@ spec:
         spec:
           containers:
             - name: page-scraper
-              image: ghcr.io/0wlie22/flat-scraper:latest
+              image: ghcr.io/0wlie22/page-scraper/page-scraper:latest
               imagePullPolicy: Always
               env:
-                - name: PS_DB_PATH
+                - name: DB_PATH
                   value: /var/db/db.json
               volumeMounts:
                 - name: database
                   mountPath: /var/db
+                - name: config-volume
+                  mountPath: /app/src/config.py
+                  subPath: config.py
+                - name: regions-volume
+                  mountPath: /app/bad_regions.geojson
+                  subPath: bad_regions.geojson
           restartPolicy: OnFailure
           volumes:
             - name: database
               persistentVolumeClaim:
                 claimName: page-scraper-pvc
                 readOnly: false
+            - name: config-volume
+              configMap:
+                name: python-app-config
+            - name: regions-volume
+              configMap:
+                name: geo-config

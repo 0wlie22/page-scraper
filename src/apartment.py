@@ -1,7 +1,7 @@
 import logging
 from typing import List, Optional, Tuple
 
-from config import MAX_COST, MIN_COST, MIN_FLOOR, ROOMS
+from .config import MAX_COST, MIN_COST, MIN_FLOOR, ROOMS
 
 
 class Appartment:
