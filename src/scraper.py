@@ -12,8 +12,8 @@ from playwright.sync_api import sync_playwright
 from shapely.geometry import Point, shape
 from tinydb import Query, TinyDB
 
-from .apartment import Appartment
-from .config import NTFY_URL, REGIONS_FILE, SS_COOKIES_URL, SS_URL
+from apartment import Appartment
+from config import NTFY_URL, REGIONS_FILE, SS_COOKIES_URL, SS_URL
 
 
 class Scraper:

@@ -2,7 +2,7 @@ import argparse
 import logging
 import os
 
-from .scraper import Scraper
+from scraper import Scraper
 
 
 def main():
