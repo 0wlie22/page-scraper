@@ -1,35 +1,21 @@
 FROM python:3.12-slim AS builder
 
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+
 RUN pip install playwright \
- && playwright install chromium
+    && playwright install chromium \
+    && chmod -R 755 /ms-playwright \
+    && ls -la /ms-playwright
 
 FROM python:3.12-slim
 
-RUN apt-get update && apt-get install -y \
-    libnss3 \
-    libatk-bridge2.0-0 \
-    libgtk-3-0 \
-    libx11-xcb1 \
-    libxcomposite1 \
-    libxdamage1 \
-    libxrandr2 \
-    libgbm1 \
-    libasound2 \
-    libpangocairo-1.0-0 \
-    libatk1.0-0 \
-    libcups2 \
-    libdrm2 \
-    libxkbcommon0 \
-    libatspi2.0-0 \
-    libxfixes3 \
-    && rm -rf /var/lib/apt/lists/*
-
 COPY --from=builder /ms-playwright /ms-playwright
 
-ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+RUN --mount=type=cache,target=/root/.cache/pip \
+    --mount=type=bind,source=requirements.txt,target=requirements.txt \
+    pip install -r requirements.txt
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
 COPY src/ /app
 WORKDIR /app
