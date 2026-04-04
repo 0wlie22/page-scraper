@@ -11,6 +11,25 @@ FROM python:3.12-slim
 
 COPY --from=builder /ms-playwright /ms-playwright
 
+RUN apt-get update && apt-get install -y \
+    libnss3 \
+    libatk-bridge2.0-0 \
+    libgtk-3-0 \
+    libx11-xcb1 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    libgbm1 \
+    libasound2 \
+    libpangocairo-1.0-0 \
+    libatk1.0-0 \
+    libcups2 \
+    libdrm2 \
+    libxkbcommon0 \
+    libatspi2.0-0 \
+    libxfixes3 \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
     pip install -r requirements.txt

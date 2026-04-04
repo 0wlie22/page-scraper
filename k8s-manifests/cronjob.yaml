@@ -23,7 +23,7 @@ spec:
                 - name: database
                   mountPath: /var/db
                 - name: config-volume
-                  mountPath: /app/src/config.py
+                  mountPath: /app/config.py
                   subPath: config.py
                 - name: regions-volume
                   mountPath: /app/bad_regions.geojson
