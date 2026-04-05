@@ -1,7 +1,7 @@
 import logging
 from typing import List, Optional, Tuple
 
-from config import MAX_COST, MIN_COST, MIN_FLOOR, ROOMS
+from config import MAX_COST, MIN_COST, MIN_FLOOR, ROOMS, MIN_ROOMS
 
 
 class Appartment:
@@ -75,7 +75,7 @@ class Appartment:
             logging.debug("Invalid rooms value: %s", self.rooms)
             return False
 
-        if rooms_value != ROOMS:
+        if rooms_value < MIN_ROOMS || rooms_value > ROOMS:
             logging.debug("Rooms count not matching: %s", self.rooms)
             return False
         return rooms_value == ROOMS
