@@ -75,7 +75,7 @@ class Appartment:
             logging.debug("Invalid rooms value: %s", self.rooms)
             return False
 
-        if rooms_value < MIN_ROOMS || rooms_value > ROOMS:
+        if rooms_value < MIN_ROOMS or rooms_value > ROOMS:
             logging.debug("Rooms count not matching: %s", self.rooms)
             return False
         return rooms_value == ROOMS
