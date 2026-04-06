@@ -76,9 +76,9 @@ class Appartment:
             return False
 
         if rooms_value < MIN_ROOMS or rooms_value > ROOMS:
-            logging.debug("Rooms count not matching: %s", self.rooms)
+            logging.debug("Rooms count out of range: %s", self.rooms)
             return False
-        return rooms_value == ROOMS
+        return True
 
     def floor_display(self) -> str:
         if not self.floor:
